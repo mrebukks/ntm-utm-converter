@@ -1,0 +1,3 @@
+# Ignore an entire directory (always add a trailing slash)
+node_modules/
+
