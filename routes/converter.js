@@ -81,7 +81,6 @@ router.post("/convert", upload.single("excelFile"), async (req, res) => {
   }
 });
 
-
 router.post("/transform", async (req, res) => {
   try {
     const { ntmBelt, utmZone, easting, northing } = req.body;
@@ -137,11 +136,9 @@ router.post("/transform-reverse", (req, res) => {
     });
   } catch (err) {
     console.error("Reverse conversion error:", err.message);
-    return res
-      .status(500)
-      .json({
-        error: "An unexpected error occurred during reverse calculation.",
-      });
+    return res.status(500).json({
+      error: "An unexpected error occurred during reverse calculation.",
+    });
   }
 });
 

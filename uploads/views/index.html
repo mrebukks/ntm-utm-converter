@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/jpeg" href="/css/logo.jpg" />
+    <link rel="icon" type="image/png" href="/css/logo.png" />
     <title>🌍 NTM to UTM Converter</title>
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
@@ -130,6 +130,23 @@
       </main>
     </div>
 
+    <footer class="app-footer">
+      <div class="footer-content">
+        <img
+          class="footer-logo"
+          src="/css/logo.png"
+          alt="Ebuka logo"
+          width="180"
+          height="76" />
+        <div>
+          <p class="footer-title">NTM to UTM Converter</p>
+          <p class="footer-copy">
+            Accurate coordinate conversion, made simple.
+          </p>
+        </div>
+      </div>
+    </footer>
+
     <script>
       const singleForm = document.getElementById("singleForm");
       const singleResult = document.getElementById("singleResult");
@@ -237,8 +254,8 @@
             }
           });
         } else {
-          labelNtmSource.textContent = "Source UTM Zone";
-          labelUtmSource.textContent = "Target NTM Belt";
+          labelNtmSource.textContent = "Source NTM Belt";
+          labelUtmSource.textContent = "Target UTM Zone";
           labeleastingInput.textContent = "NTM Easting";
           labelnorthingInput.textContent = "NTM Northing";
         }
