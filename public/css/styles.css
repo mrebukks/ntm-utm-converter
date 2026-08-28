@@ -69,6 +69,10 @@ body {
   gap: 24px;
 }
 
+.hidden {
+  display: none;
+}
+
 /* Cards */
 .card {
   background: var(--card-bg);

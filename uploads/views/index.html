@@ -86,12 +86,19 @@
         </section>
 
         <!-- Card 2: Batch Excel File Upload -->
-        <section class="card">
+        <section class="card hidden" id="batch">
           <h2>Batch Excel Conversion</h2>
           <p class="card-desc">
             Upload a spreadsheet containing <strong>Easting</strong> and
             <strong>Northing</strong> columns.
           </p>
+
+          <div class="batch-toggle">
+            <label class="switch">
+              <input type="checkbox" id="batchToggle" autocomplete="off" />
+              <span class="slider round"></span>
+            </label>
+          </div>
 
           <form action="/convert" method="POST" enctype="multipart/form-data">
             <div class="form-group">
@@ -105,6 +112,59 @@
 
             <div class="form-group">
               <label for="batchUtmZone">Target UTM Zone</label>
+              <select name="utmZone" id="batchUtmZone" required>
+                <option value="UTM_31N">UTM Zone 31N</option>
+                <option value="UTM_32N" selected>UTM Zone 32N</option>
+                <option value="UTM_33N">UTM Zone 33N</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="excelFile">Upload Excel File (.xlsx, .xls)</label>
+              <input
+                type="file"
+                name="excelFile"
+                id="excelFile"
+                accept=".xlsx, .xls"
+                required />
+            </div>
+
+            <button type="submit" class="btn btn-secondary">
+              Convert & Download Excel
+            </button>
+          </form>
+        </section>
+
+        <!-- Card 3: Batch Excel File Upload Reverse-->
+        <section class="card" id="reverse-batch">
+          <h2>Batch Excel Conversion</h2>
+          <p class="card-desc">
+            Upload a spreadsheet containing <strong>Easting</strong> and
+            <strong>Northing</strong> columns.
+          </p>
+
+          <div class="batch-toggle">
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="batchReverseToggle"
+                autocomplete="off" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <form action="/reverse" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="batchNtmBelt">Target NTM Belt</label>
+              <select name="ntmBelt" id="batchNtmBelt" required>
+                <option value="WEST_BELT">West Belt (CM 4.5° E)</option>
+                <option value="MID_BELT" selected>Mid Belt (CM 8.5° E)</option>
+                <option value="EAST_BELT">East Belt (CM 12.5° E)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="batchUtmZone">Source UTM Zone</label>
               <select name="utmZone" id="batchUtmZone" required>
                 <option value="UTM_31N">UTM Zone 31N</option>
                 <option value="UTM_32N" selected>UTM Zone 32N</option>
@@ -150,6 +210,7 @@
     <script>
       const singleForm = document.getElementById("singleForm");
       const singleResult = document.getElementById("singleResult");
+      // toggle button to activate Reverse Coordinate conversion
       const reverseToggle = document.getElementById("reverseToggle");
 
       reverseToggle.checked = false;
@@ -165,6 +226,29 @@
       const labelnorthingInput = document.querySelector(
         'label[for="northing"]',
       );
+
+      // Batch cards
+      const batchCard = document.getElementById("batch");
+      const batchReverse = document.getElementById("reverse-batch");
+
+      // toggle button for batch conversion
+      const batchToggle = document.getElementById("batchToggle");
+      const batchReverseToggle = document.getElementById("batchReverseToggle");
+
+      const setBatchMode = (showForward) => {
+        batchCard.classList.toggle("hidden", !showForward);
+        batchReverse.classList.toggle("hidden", showForward);
+        batchToggle.checked = showForward;
+        batchReverseToggle.checked = showForward;
+      };
+
+      batchToggle.addEventListener("change", () => {
+        setBatchMode(batchToggle.checked);
+      });
+
+      batchReverseToggle.addEventListener("change", () => {
+        setBatchMode(batchReverseToggle.checked);
+      });
 
       // Listening for the form submission.
       if (!isReverse) {

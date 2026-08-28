@@ -44,6 +44,7 @@ function convertPoint(easting, northing, ntmBelt, utmZone) {
 /**
  * Converts Reverse: UTM -> NTM
  */
+
 function convertUtmToNtm(utmEasting, utmNorthing, utmZone, ntmBelt) {
   const sourceProj = UTM_PROJECTIONS[utmZone]; // Source is now UTM
   const targetProj = NTM_PROJECTIONS[ntmBelt]; // Target is now NTM

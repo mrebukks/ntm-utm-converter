@@ -81,6 +81,79 @@ router.post("/convert", upload.single("excelFile"), async (req, res) => {
   }
 });
 
+router.post("/reverse", upload.single("excelFile"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send("No file uploaded.");
+    }
+
+    const { ntmBelt, utmZone } = req.body;
+
+    // 1. Read uploaded Excel file using ExcelJS
+    const inputWorkbook = new ExcelJS.Workbook();
+    // we use load and buffer here because we are storing using RAM.
+    await inputWorkbook.xlsx.load(req.file.buffer);
+    // grabbing the first worksheets.
+    const worksheet = inputWorkbook.worksheets[0];
+
+    // 2. Prepare new Workbook for downloading
+    const outputWorkbook = new ExcelJS.Workbook();
+    const outputSheet = outputWorkbook.addWorksheet("UTM to NTM");
+
+    // Define output columns
+    outputSheet.columns = [
+      { header: "Point ID / Name", key: "id", width: 18 },
+      { header: "UTM Easting (m)", key: "utmEasting", width: 18 },
+      { header: "UTM Northing (m)", key: "utmNorthing", width: 18 },
+      { header: "Target Zone", key: "utmZone", width: 15 },
+      { header: "NTM Easting (m)", key: "ntmEasting", width: 18 },
+      { header: "NTM Northing (m)", key: "ntmNorthing", width: 18 },
+    ];
+
+    // Style header row (bold)
+    outputSheet.getRow(1).font = { bold: true };
+
+    // 3. Loop through rows (skip header row 1)
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // Skip original headers
+
+      const pointId = row.getCell(1).value || `Pt_${rowNumber - 1}`;
+      const easting = parseFloat(row.getCell(2).value);
+      const northing = parseFloat(row.getCell(3).value);
+
+      // A check to confirm if both are not numbers.
+      if (!isNaN(easting) && !isNaN(northing)) {
+        const converted = convertUtmToNtm(easting, northing, utmZone, ntmBelt);
+
+        outputSheet.addRow({
+          id: pointId,
+          utmEasting: easting,
+          utmNorthing: northing,
+          utmZone: utmZone,
+          ntmEasting: converted.ntmEasting,
+          ntmNorthing: converted.ntmNorthing,
+        });
+      }
+    });
+
+    // 4. Send the new file back to the user as a download
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=Converted_NTM_Coordinates.xlsx",
+    );
+
+    await outputWorkbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Error during conversion:", error);
+    res.status(500).send("An error occurred while processing your Excel file.");
+  }
+});
+
 router.post("/transform", async (req, res) => {
   try {
     const { ntmBelt, utmZone, easting, northing } = req.body;
