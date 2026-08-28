@@ -105,7 +105,7 @@ router.post("/reverse", upload.single("excelFile"), async (req, res) => {
       { header: "Point ID / Name", key: "id", width: 18 },
       { header: "UTM Easting (m)", key: "utmEasting", width: 18 },
       { header: "UTM Northing (m)", key: "utmNorthing", width: 18 },
-      { header: "Target Zone", key: "utmZone", width: 15 },
+      { header: "Source UTM Zone", key: "utmZone", width: 15 },
       { header: "NTM Easting (m)", key: "ntmEasting", width: 18 },
       { header: "NTM Northing (m)", key: "ntmNorthing", width: 18 },
     ];
