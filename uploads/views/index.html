@@ -35,7 +35,7 @@
 
           <form action="/transform" method="POST" id="singleForm">
             <div class="form-group">
-              <label for="singleNtmBelt" id="labelNtm">Source NTM Belt</label>
+              <label for="singleNtmBelt">Source NTM Belt</label>
               <select name="ntmBelt" id="singleNtmBelt" required>
                 <option value="WEST_BELT">West Belt (CM 4.5° E)</option>
                 <option value="MID_BELT" selected>Mid Belt (CM 8.5° E)</option>
@@ -44,7 +44,7 @@
             </div>
 
             <div class="form-group">
-              <label for="singleUtmZone" id="labelUtm">Target UTM Zone</label>
+              <label for="singleUtmZone">Target UTM Zone</label>
               <select name="utmZone" id="singleUtmZone" required>
                 <option value="UTM_31N">UTM Zone 31N</option>
                 <option value="UTM_32N" selected>UTM Zone 32N</option>
@@ -54,7 +54,7 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="easting">NTM Easting (m)</label>
+                <label for="easting">NTM Easting</label>
                 <input
                   type="number"
                   step="any"
@@ -65,12 +65,64 @@
               </div>
 
               <div class="form-group">
-                <label for="northing">NTM Northing (m)</label>
+                <label for="northing">NTM Northing</label>
                 <input
                   type="number"
                   step="any"
                   name="northing"
                   id="northing"
+                  placeholder="e.g. 500000.00"
+                  required />
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              Convert Single Point
+            </button>
+          </form>
+
+          <form
+            action="/transform-reverse"
+            method="POST"
+            id="singleReverseForm"
+            class="hidden">
+            <div class="form-group">
+              <label for="singleReverseNtmBelt">Target NTM Belt</label>
+              <select name="ntmBelt" id="singleReverseNtmBelt" required>
+                <option value="WEST_BELT">West Belt (CM 4.5° E)</option>
+                <option value="MID_BELT" selected>Mid Belt (CM 8.5° E)</option>
+                <option value="EAST_BELT">East Belt (CM 12.5° E)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="singleReverseUtmZone">Source UTM Zone</label>
+              <select name="utmZone" id="singleReverseUtmZone" required>
+                <option value="UTM_31N">UTM Zone 31N</option>
+                <option value="UTM_32N" selected>UTM Zone 32N</option>
+                <option value="UTM_33N">UTM Zone 33N</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reverseEasting">UTM Easting</label>
+                <input
+                  type="number"
+                  step="any"
+                  name="easting"
+                  id="reverseEasting"
+                  placeholder="e.g. 670553.98"
+                  required />
+              </div>
+
+              <div class="form-group">
+                <label for="reverseNorthing">UTM Northing</label>
+                <input
+                  type="number"
+                  step="any"
+                  name="northing"
+                  id="reverseNorthing"
                   placeholder="e.g. 500000.00"
                   required />
               </div>
@@ -255,23 +307,12 @@
 
     <script>
       const singleForm = document.getElementById("singleForm");
+      const singleReverseForm = document.getElementById("singleReverseForm");
       const singleResult = document.getElementById("singleResult");
       // toggle button to activate Reverse Coordinate conversion
       const reverseToggle = document.getElementById("reverseToggle");
 
       reverseToggle.checked = false;
-      let isReverse = reverseToggle.checked;
-      const labelNtmSource = document.querySelector(
-        'label[for="singleNtmBelt"]',
-      );
-      const labelUtmSource = document.querySelector(
-        'label[for="singleUtmZone"]',
-      );
-      // for the inputs
-      const labeleastingInput = document.querySelector('label[for="easting"]');
-      const labelnorthingInput = document.querySelector(
-        'label[for="northing"]',
-      );
 
       // Batch cards
       const batchCard = document.getElementById("batch");
@@ -300,99 +341,62 @@
         setBatchMode(batchReverseToggle.checked);
       });
 
-      // Listening for the form submission.
-      if (!isReverse) {
-        singleForm.addEventListener("submit", async (event) => {
-          event.preventDefault();
+      const setSingleMode = (showForward) => {
+        singleForm.classList.toggle("hidden", !showForward);
+        singleReverseForm.classList.toggle("hidden", showForward);
+      };
 
-          const formData = new FormData(singleForm);
-          const data = Object.fromEntries(formData.entries());
+      const submitSingleForm = async (form, isReverse) => {
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
 
-          try {
-            const response = await fetch(singleForm.action, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(data),
-            });
+        try {
+          const response = await fetch(form.action, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
 
-            const result = await response.json();
+          const result = await response.json();
 
-            if (!response.ok) {
-              throw new Error(result.error || "Conversion failed.");
-            }
+          if (!response.ok) {
+            throw new Error(result.error || "Conversion failed.");
+          }
 
-            singleResult.style.display = "block";
-            singleResult.innerHTML = `
+          const easting = isReverse ? result.ntmEasting : result.utmEasting;
+          const northing = isReverse ? result.ntmNorthing : result.utmNorthing;
+          const coordinateSystem = isReverse ? "NTM" : result.zone;
+
+          singleResult.style.display = "block";
+          singleResult.innerHTML = `
             <h3>Transformed Coordinates:</h3>
             <div class="result-row">
-              <label>${result.zone} Easting:
-                <input type="text" value="${result.utmEasting} m" readonly>
+              <label>${coordinateSystem} Easting:
+                <input type="text" value="${easting} m" readonly>
               </label>
-              <label>${result.zone} Northing:
-                <input type="text" value="${result.utmNorthing} m" readonly>
+              <label>${coordinateSystem} Northing:
+                <input type="text" value="${northing} m" readonly>
               </label>
             </div>
           `;
-          } catch (error) {
-            singleResult.style.display = "block";
-            singleResult.innerHTML = `<p class="error-text">${error.message}</p>`;
-          }
-        });
-      }
+        } catch (error) {
+          singleResult.style.display = "block";
+          singleResult.innerHTML = `<p class="error-text">${error.message}</p>`;
+        }
+      };
+
+      singleForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        submitSingleForm(singleForm, false);
+      });
+
+      singleReverseForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        submitSingleForm(singleReverseForm, true);
+      });
 
       reverseToggle.addEventListener("change", () => {
-        isReverse = reverseToggle.checked;
-
-        if (isReverse) {
-          labelNtmSource.textContent = "Target NTM Belt";
-          labelUtmSource.textContent = "Source UTM Zone";
-          labeleastingInput.textContent = "UTM Easting";
-          labelnorthingInput.textContent = "UTM Northing";
-          /////
-          singleForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const formData = new FormData(singleForm);
-            const data = Object.fromEntries(formData.entries());
-
-            console.log(data);
-
-            try {
-              const response = await fetch("/transform-reverse", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-              });
-
-              const result = await response.json();
-
-              if (!response.ok) {
-                throw new Error(result.error || "Conversion failed.");
-              }
-
-              singleResult.style.display = "block";
-              singleResult.innerHTML = `
-            <h3>Transformed Coordinates:</h3>
-            <div class="result-row">
-              <label>NTM Easting:
-                <input type="text" value="${result.ntmEasting} m" readonly>
-              </label>
-              <label>NTM Northing:
-                <input type="text" value="${result.ntmNorthing} m" readonly>
-              </label>
-            </div>
-          `;
-            } catch (error) {
-              singleResult.style.display = "block";
-              singleResult.innerHTML = `<p class="error-text">${error.message}</p>`;
-            }
-          });
-        } else {
-          labelNtmSource.textContent = "Source NTM Belt";
-          labelUtmSource.textContent = "Target UTM Zone";
-          labeleastingInput.textContent = "NTM Easting";
-          labelnorthingInput.textContent = "NTM Northing";
-        }
+        setSingleMode(!reverseToggle.checked);
       });
     </script>
   </body>
