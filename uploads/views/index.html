@@ -235,9 +235,13 @@
       const batchToggle = document.getElementById("batchToggle");
       const batchReverseToggle = document.getElementById("batchReverseToggle");
 
+      // function to make the toggle sliders sync/move together.
       const setBatchMode = (showForward) => {
+        // if showforward is true, batchCard is set to hidden
         batchCard.classList.toggle("hidden", !showForward);
+        // the reverse card is displayed. using check property as truth.
         batchReverse.classList.toggle("hidden", showForward);
+        // the main trick to keep them both moving together.
         batchToggle.checked = showForward;
         batchReverseToggle.checked = showForward;
       };
@@ -275,10 +279,10 @@
             singleResult.innerHTML = `
             <h3>Transformed Coordinates:</h3>
             <div class="result-row">
-              <label>UTM Easting:
+              <label>${result.zone} Easting:
                 <input type="text" value="${result.utmEasting} m" readonly>
               </label>
-              <label>UTM Northing:
+              <label>${result.zone} Northing:
                 <input type="text" value="${result.utmNorthing} m" readonly>
               </label>
             </div>

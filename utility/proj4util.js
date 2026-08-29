@@ -6,9 +6,9 @@ const MINNA_BASE = "+proj=tmerc +ellps=clrk80 +units=m +no_defs";
 
 // NTM Projection Strings
 const NTM_PROJECTIONS = {
-  WEST_BELT: `${MINNA_BASE} +lat_0=4 +lon_0=4.5 +k=0.99975 +x_0=670553.98 +y_0=0 +a6378249.145 +rf=293.465 +towgs84=-92,-93,122,0,0,0,0 +units=m`,
+  WEST_BELT: `${MINNA_BASE} +lat_0=4 +lon_0=4.5 +k=0.99975 +x_0=230738.266 +y_0=0 +a=6378249.145 +rf=293.465 +towgs84=-92,-93,122,0,0,0,0 +units=m`,
   MID_BELT: `${MINNA_BASE} +lat_0=4 +lon_0=8.5 +k=0.99975 +x_0=670553.98 +y_0=0 +a=6378249.145 +rf=293.465 +towgs84=-92,-93,122,0,0,0,0 +units=m`,
-  EAST_BELT: `${MINNA_BASE} +lat_0=4 +lon_0=12.5 +k=0.99975 +x_0=670553.98 +y_0=0 +a=6378249.145 +rf=293.465 +towgs84=-92,-93,122,0,0,0,0 +units=m`,
+  EAST_BELT: `${MINNA_BASE} +lat_0=4 +lon_0=12.5 +k=0.99975 +x_0=1110369.7 +y_0=0 +a=6378249.145 +rf=293.465 +towgs84=-92,-93,122,0,0,0,0 +units=m`,
 };
 
 // Target UTM Projections (WGS84)
@@ -38,6 +38,7 @@ function convertPoint(easting, northing, ntmBelt, utmZone) {
   return {
     utmEasting: Number(utmEasting.toFixed(3)),
     utmNorthing: Number(utmNorthing.toFixed(3)),
+    zone: utmZone,
   };
 }
 
