@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 // Dynamic Sitemap Route
-app.get("/sitemap.xml", (req, res) => {
+router.get("/sitemap.xml", (req, res) => {
   // Set the correct content type for XML
   res.header("Content-Type", "application/xml");
 
