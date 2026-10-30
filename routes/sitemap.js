@@ -1,3 +1,6 @@
+const express = require("express");
+const router = express.Router();
+
 // Dynamic Sitemap Route
 app.get("/sitemap.xml", (req, res) => {
   // Set the correct content type for XML
@@ -30,3 +33,5 @@ app.get("/sitemap.xml", (req, res) => {
   // Send the XML response back to the browser/crawler
   res.send(sitemap);
 });
+
+module.exports = router;
