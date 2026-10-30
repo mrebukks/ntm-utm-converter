@@ -1,3 +1,6 @@
 # Ignore an entire directory (always add a trailing slash)
 node_modules/
 
+# Ignore testing js
+testing.js/
+
