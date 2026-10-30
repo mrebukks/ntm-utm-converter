@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 // importing the converter path
 const converterRoute = require("./routes/converter");
-
+const sitemapRoute = require("./routes/sitemap");
 const app = express();
 
 const Port = 3000;
@@ -21,6 +21,7 @@ app.get("/", (req, res) => {
 
 // Register the converter route
 app.use("/", converterRoute);
+app.use("/", sitemapRoute);
 
 app.listen(Port || 3000, () => {
   console.log("successfully listening");
